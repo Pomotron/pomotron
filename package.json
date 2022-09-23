@@ -5,7 +5,7 @@
   "description": "App para controle de horas com alarme",
   "main": "src/index.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -48,17 +48,11 @@
       }
     }
   },
-  "dependencies": {
-    "electron-compile": "^6.4.2",
-    "electron-devtools-installer": "^2.2.3",
-    "electron-squirrel-startup": "^1.0.0"
-  },
   "devDependencies": {
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
-    "electron-forge": "^5.1.0",
-    "electron-prebuilt-compile": "1.8.2",
+    "electron": "^20.2.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.19.1"
