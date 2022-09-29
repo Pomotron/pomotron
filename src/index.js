@@ -1,61 +1,43 @@
-"use strict";
+// Modules to control application life and create native browser window
+const {app, BrowserWindow} = require('electron')
+const path = require('path')
 
-// [run the app]
-// $ npm install electron
-// $ ./node_modules/.bin/electron .
+function createWindow () {
+  // Create the browser window.
+  const mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
 
-import { app, BrowserWindow, Tray, nativeImage, Menu } from 'electron';
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
-import { enableLiveReload } from 'electron-compile';
+  // and load the index.html of the app.
+  mainWindow.loadFile('./src/index.html')
 
-let top = {}; // prevent gc to keep windows
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools()
+}
 
-app.once("ready", ev => {
-    top.win = new BrowserWindow({
-        width: 800, height: 600, center: true, minimizable: false, show: false,
-        webPreferences: {
-            nodeIntegration: false,
-            webSecurity: true,
-            sandbox: true,
-        },                                
-    });
-    top.win.loadURL(`file://${__dirname}/index.html`);
-    top.win.on("close", ev => {
-        //console.log(ev);
-        ev.sender.hide();
-        ev.preventDefault(); // prevent quit process
-    });
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.whenReady().then(() => {
+  createWindow()
 
-    // empty image as transparent icon: it can click
-    // see: https://electron.atom.io/docs/api/tray/
-    top.tray = new Tray(nativeImage.createEmpty());
-    const menu = Menu.buildFromTemplate([
-        {label: "Pomotron", submenu: [
-            {label: "Abrir", click: (item, window, event) => {
-                //console.log(item, event);
-                top.win.show();
-            }},
-        ]},
-        {type: "separator"},
-        {role: "quit"}, // "role": system prepared action menu
-    ]);
-    top.tray.setToolTip("Pomotron");
-    //top.tray.setTitle("Tray Example"); // macOS only
-    top.tray.setContextMenu(menu);
+  app.on('activate', function () {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
 
-    // Option: some animated web site to tray icon image
-    // see: https://electron.atom.io/docs/tutorial/offscreen-rendering/
-    top.icons = new BrowserWindow({
-        show: false, webPreferences: {offscreen: true}});
-    top.icons.loadURL(`file://${__dirname}/img/watch.svg`);
-    top.icons.webContents.on("paint", (event, dirty, image) => {
-        if (top.tray) top.tray.setImage(image.resize({width: 16, height: 16}));
-    });
-});
-app.on("before-quit", ev => {
-    // BrowserWindow "close" event spawn after quit operation,
-    // it requires to clean up listeners for "close" event
-    top.win.removeAllListeners("close");
-    // release windows
-    top = null;
-});
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+})
+
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
